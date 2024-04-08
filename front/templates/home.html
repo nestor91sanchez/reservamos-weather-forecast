@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">Weather Forecast</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Content Section -->
+    <div class="container mt-4">
+
+        <div class="row">
+            <div class="col col-10">
+                <h1>Welcome to Weather Forecast</h1>
+                <p>This is the homepage of your website.</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col col-4">
+                <form>
+                    <div class="mb-3">
+                        <label for="inputField" class="form-label">Ciudad</label>
+                        <input type="text" id="inputField" class="form-control" placeholder="Monterrey...">
+                    </div>
+                    <button type="button" id="submitButton" class="btn btn-primary">Search</button>
+                </form>
+            </div>
+            <div class="col col-8">
+                <div class="row mt-4" id="weather-list-loader" style="display:none">
+                    <div class="col">
+                        <div class="spinner-grow" role="status">
+                            <span class="sr-only"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div id="weather-list" style="height:400px;overflow-x:auto;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#submitButton').click(function(){
+                $("#submitButton").text("Searching...");
+                $("#submitButton").prop('disabled', true);
+                $("#weather-list-loader").show();
+                var inputValue = $('#inputField').val();
+                $.ajax({
+                    url: '/api/v1/weather-forecast/'+inputValue,
+                    type: 'GET',
+                    data: {'inputValue': inputValue},
+                    success: function(response) {
+                        $("#weather-list-loader").hide();
+                        $("#submitButton").text("Search");
+                        $("#submitButton").prop('disabled', false);
+                        var weatherList = $('#weather-list');
+                        $.each(response, function(index, forecast){
+                            var city = forecast.display+' '+forecast.city;
+                            var forecastList = $('<ul class="list-group">');
+                            $.each(forecast.forecast, function(i, dayForecast){
+                              var dt = new Date(dayForecast.dt * 1000);
+                              var date = dt.toDateString();
+                              var maxTemp = dayForecast.max_temp;
+                              var minTemp = dayForecast.min_temp;
+                              var listItem = $('<li class="list-group-item">').text(date + ' - Max Temp: ' + maxTemp + ' - Min Temp: ' + minTemp);
+                              forecastList.append(listItem);
+                            });
+                            var cityInfo = $('<div class="forecast-container">').html('<h3>' + city + '</h3>').append(forecastList);
+                            weatherList.append(cityInfo);
+                        });
+                    },
+                    error: function() {
+                        $("#weather-list-loader").hide();
+                        $("#submitButton").text("Search");
+                        $("#submitButton").prop('disabled', false);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
