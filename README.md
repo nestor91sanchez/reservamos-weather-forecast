@@ -14,11 +14,15 @@ This project is a Django application that consists an API Rest and a frontend in
 ```
 venv/bin/activate
 ```
-2. Run Migration
+2. Create a .env file and put the OPEN_WEATHER_API_KEY
+```
+touch weather_forecast .env
+```
+3. Run Migration
 ```
 python manage.py migrate
 ```
-3. Run Server
+4. Run Server
 ```
 python manage.py runserver
 ```
